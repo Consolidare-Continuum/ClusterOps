@@ -4,34 +4,34 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "clusterops"
-version = "0.2.1"
-description = "Paper - Pytorch"
+version = "0.3.0+cc0"
+description = "CPU affinity and optional GPU helpers for CC_ cluster jobs"
 license = "MIT"
-authors = ["Kye Gomez <kye@apac.ai>"]
-homepage = "https://github.com/The-Swarm-Corporation/ClusterOps"
-documentation = "https://github.com/The-Swarm-Corporation/ClusterOps"  # Add this if you have documentation.
-readme = "README.md"  # Assuming you have a README.md
-repository = "https://github.com/The-Swarm-Corporation/ClusterOps"
-keywords = ["artificial intelligence", "deep learning", "optimizers", "Prompt Engineering"]
+authors = ["CONSOLIDARE CONTINUUM <igareosh@igareosh.com>"]
+homepage = "https://github.com/Consolidare-Continuum/ClusterOps"
+documentation = "https://github.com/Consolidare-Continuum/ClusterOps"
+readme = "README.md"
+repository = "https://github.com/Consolidare-Continuum/ClusterOps"
+keywords = ["cpu-affinity", "cluster", "multiprocessing", "gpu", "cc_"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: System :: Distributed Computing",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.9"
+    "Programming Language :: Python :: 3.10",
 ]
 
 [tool.poetry.dependencies]
 python = "^3.10"
 loguru = "*"
-ray = "*"
-gputil = "*"
 tenacity = "*"
 psutil = "*"
 pathos = "*"
+ray = { version = "*", optional = true }
+gputil = { version = "*", optional = true }
 
-
-
+[tool.poetry.extras]
+gpu = ["ray", "gputil"]
 
 [tool.poetry.group.lint.dependencies]
 ruff = "^0.1.6"

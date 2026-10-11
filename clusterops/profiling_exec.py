@@ -3,9 +3,13 @@ import sys
 import time
 from typing import Any, Callable, Dict, Optional, Union
 
-import GPUtil
 import psutil
 from loguru import logger
+
+try:
+    import GPUtil
+except ImportError:  # pragma: no cover — CPU-only install
+    GPUtil = None
 
 # Configurable environment variables with validation
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
@@ -82,8 +86,8 @@ def monitor_resources(
             stats["alerts"].append(alert)
             logger.warning(alert)
 
-        # Monitor GPUs if threshold provided
-        if gpu_threshold is not None:
+        # Monitor GPUs if threshold provided and GPUtil installed
+        if gpu_threshold is not None and GPUtil is not None:
             gpus = GPUtil.getGPUs()
             for gpu in gpus:
                 memory_usage = 100 * (
@@ -149,7 +153,7 @@ def profile_execution(
         # Get initial resource usage
         metrics["cpu_usage"]["initial"] = psutil.cpu_percent()
 
-        if collect_gpu_metrics:
+        if collect_gpu_metrics and GPUtil is not None:
             gpus = GPUtil.getGPUs()
             metrics["gpu_usage"]["initial"] = {
                 gpu.id: {
@@ -167,7 +171,7 @@ def profile_execution(
         metrics["execution_time"] = time.time() - start_time
         metrics["cpu_usage"]["final"] = psutil.cpu_percent()
 
-        if collect_gpu_metrics:
+        if collect_gpu_metrics and GPUtil is not None:
             gpus = GPUtil.getGPUs()
             metrics["gpu_usage"]["final"] = {
                 gpu.id: {
@@ -186,7 +190,7 @@ def profile_execution(
             f"CPU usage: {metrics['cpu_usage']['initial']}% -> {metrics['cpu_usage']['final']}%"
         )
 
-        if collect_gpu_metrics:
+        if collect_gpu_metrics and GPUtil is not None:
             for gpu_id, usage in metrics["gpu_usage"][
                 "final"
             ].items():

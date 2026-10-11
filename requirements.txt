@@ -1,6 +1,5 @@
+# CPU-only core (CC adapt 0.3.0+cc0) — no ray / GPUtil
 loguru
-ray
-GPUtil
 tenacity
 psutil
 pathos

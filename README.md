@@ -1,14 +1,12 @@
 # ClusterOps
 
-[![Join our Discord](https://img.shields.io/badge/Discord-Join%20our%20server-5865F2?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/agora-999382051935506503) [![Subscribe on YouTube](https://img.shields.io/badge/YouTube-Subscribe-red?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/@kyegomez3242) [![Connect on LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/kye-g-38759a207/) [![Follow on X.com](https://img.shields.io/badge/X.com-Follow-1DA1F2?style=for-the-badge&logo=x&logoColor=white)](https://x.com/kyegomezb)
+**Maintained by [Consolidare Continuum](https://github.com/Consolidare-Continuum/ClusterOps)** — fork of Swarms / The-Swarm-Corporation ClusterOps. **License: MIT** (unchanged). See [CC-ADAPT.md](CC-ADAPT.md) for dual vestment with the CC_ brain `scripts/clusterops` shim and optional GPU extras.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-brightgreen.svg)](https://python.org)
-[![Build Status](https://img.shields.io/github/actions/workflow/status/swarms-team/clusterops/test.yml?branch=master)](https://github.com/swarms-team/clusterops/actions)
-[![Coverage Status](https://img.shields.io/codecov/c/github/swarms-team/clusterops)](https://codecov.io/gh/swarms-team/clusterops)
+[![Python Version](https://img.shields.io/badge/python-3.10%2B-brightgreen.svg)](https://python.org)
+[![Repo](https://img.shields.io/badge/github-Consolidare--Continuum%2FClusterOps-181717?logo=github)](https://github.com/Consolidare-Continuum/ClusterOps)
 
-
-**ClusterOps** is an enterprise-grade Python library developed and maintained by the **Swarms Team** to help you manage and execute agents on specific **CPUs** and **GPUs** across clusters. This tool enables advanced CPU and GPU selection, dynamic task allocation, and resource monitoring, making it ideal for high-performance distributed computing environments.
+**ClusterOps** helps manage and execute jobs on specific **CPUs** (core) and optionally **GPUs** (extras) across clusters — CPU affinity, dynamic task allocation, and resource monitoring for high-performance environments.
 
 
 
@@ -30,8 +28,15 @@
 
 
 ```bash
-pip3 install -U clusterops
+# CPU-only (default — no Ray)
+pip install -e .                 # from this clone
+# or: pip install -r requirements.txt && pip install -e .
+
+# GPU extras (Ray + GPUtil)
+pip install -e '.[gpu]'
 ```
+
+PyPI `pip3 install -U clusterops` may still point at upstream until a CC release is published.
 
 ---
 

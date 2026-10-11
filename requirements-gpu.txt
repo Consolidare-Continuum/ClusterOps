@@ -1,0 +1,4 @@
+# GPU extras — also: pip install 'clusterops[gpu]' / poetry install -E gpu
+-r requirements.txt
+ray
+GPUtil

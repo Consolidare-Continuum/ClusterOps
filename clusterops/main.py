@@ -2,15 +2,44 @@ import json
 import os
 import platform
 import time
+from multiprocessing import Pool as MpPool
 from typing import Any, Callable, List, Optional
 
-import GPUtil
 import psutil
-import ray
 from loguru import logger
-from ray.util.multiprocessing import (
-    Pool,
-)
+
+try:
+    import GPUtil
+except ImportError:  # pragma: no cover — CPU-only install
+    GPUtil = None
+
+try:
+    import ray
+    from ray.util.multiprocessing import Pool as RayPool
+except ImportError:  # pragma: no cover — CPU-only install
+    ray = None
+    RayPool = None
+
+
+def _require_gpu_extras() -> None:
+    """Raise if GPU extras (ray + GPUtil) are not installed."""
+    missing = []
+    if GPUtil is None:
+        missing.append("GPUtil")
+    if ray is None:
+        missing.append("ray")
+    if missing:
+        raise ImportError(
+            "GPU helpers need extras ["
+            + ", ".join(missing)
+            + "]. Install: pip install 'clusterops[gpu]' "
+            "or pip install -r requirements-gpu.txt"
+        )
+
+
+def _cpu_pool():
+    """Prefer Ray Pool when present; else stdlib multiprocessing."""
+    return RayPool if RayPool is not None else MpPool
 
 # Configurable environment variables
 LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO")
@@ -53,6 +82,7 @@ def force_execute_all_cores(
         )
 
         # Create a Pool with all available cores
+        Pool = _cpu_pool()
         with Pool(processes=total_cores) as pool:
             # Wrap the function to handle kwargs
             def wrapped_func(_):
@@ -368,6 +398,7 @@ def list_available_gpus() -> List[str]:
         RuntimeError: If no GPUs are found.
     """
     try:
+        _require_gpu_extras()
         gpus = GPUtil.getGPUs()
         if not gpus:
             raise RuntimeError("No GPUs found.")
@@ -402,6 +433,7 @@ def execute_on_gpu(
         RuntimeError: If there is an error executing the function on the GPU.
     """
     try:
+        _require_gpu_extras()
         if func_kwargs is None:
             func_kwargs = {}
 
@@ -456,6 +488,7 @@ def execute_on_multiple_gpus(
         RuntimeError: If there is an error executing the function on the GPUs.
     """
     try:
+        _require_gpu_extras()
         available_gpus = list_available_gpus()
 
         if all_gpus:
@@ -523,6 +556,7 @@ def distributed_execute_on_gpus(
     if not gpu_ids:
         raise ValueError("Must specify at least one GPU ID")
 
+    _require_gpu_extras()
     available_gpus = [gpu.id for gpu in GPUtil.getGPUs()]
     invalid_gpus = [id for id in gpu_ids if id not in available_gpus]
     if invalid_gpus:
@@ -552,6 +586,7 @@ def distributed_execute_on_gpus(
                     )  # Exponential backoff
 
         # Distribute tasks
+        Pool = _cpu_pool()
         pool = Pool()
         result_futures = [
             pool.apply_async(task_wrapper.remote, args=(args, kwargs))
